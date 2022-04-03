@@ -3,20 +3,26 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Patch,
   Post,
 } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { UpdateResult } from 'typeorm';
 import { Product } from './product.entity';
 import { ProductService } from './product.service';
 
 @Controller('products')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    @Inject('PRODUCTS_SERVICE') private readonly client: ClientProxy,
+  ) {}
 
   @Get()
   public all(): Promise<Product[]> {
+    this.client.emit('hello', 'Hello from Rabbit MQ!');
     return this.productService.all();
   }
 
